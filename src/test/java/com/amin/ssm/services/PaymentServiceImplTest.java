@@ -4,7 +4,7 @@ import com.amin.ssm.domain.Payment;
 import com.amin.ssm.domain.PaymentState;
 import com.amin.ssm.repository.PaymentRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +26,8 @@ class PaymentServiceImplTest {
         payment = Payment.builder().amount(new BigDecimal("12.99")).build();
     }
 
-    @Test
     @Transactional
+    @RepeatedTest(10)
     void process() {
         Payment savedPayment = paymentService.newPayment(payment);
         System.out.println("Should be NEW");
