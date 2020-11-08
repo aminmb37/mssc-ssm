@@ -40,7 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public StateMachine<PaymentState, PaymentEvent> authorize(Long paymentId) {
         StateMachine<PaymentState, PaymentEvent> stateMachine = build(paymentId);
-        sendEvent(paymentId, stateMachine, PaymentEvent.AUTH_APPROVED);
+        sendEvent(paymentId, stateMachine, PaymentEvent.AUTHORIZE);
         return stateMachine;
     }
 

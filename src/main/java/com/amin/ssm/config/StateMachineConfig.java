@@ -36,7 +36,13 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<PaymentSta
                 .and().withExternal().source(PaymentState.NEW)
                 .target(PaymentState.PRE_AUTH).event(PaymentEvent.PRE_AUTH_APPROVED)
                 .and().withExternal().source(PaymentState.NEW)
-                .target(PaymentState.PRE_AUTH_ERR).event(PaymentEvent.PRE_AUTH_DECLINED);
+                .target(PaymentState.PRE_AUTH_ERR).event(PaymentEvent.PRE_AUTH_DECLINED)
+                .and().withExternal().source(PaymentState.PRE_AUTH)
+                .target(PaymentState.PRE_AUTH).event(PaymentEvent.AUTHORIZE).action(authorizeAction())
+                .and().withExternal().source(PaymentState.PRE_AUTH)
+                .target(PaymentState.AUTH).event(PaymentEvent.AUTH_APPROVED)
+                .and().withExternal().source(PaymentState.PRE_AUTH)
+                .target(PaymentState.AUTH_ERR).event(PaymentEvent.AUTH_DECLINED);
     }
 
     @Override
@@ -50,7 +56,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<PaymentSta
         config.withConfiguration().listener(adapter);
     }
 
-    public Action<PaymentState, PaymentEvent> preAuthAction() {
+    private Action<PaymentState, PaymentEvent> preAuthAction() {
         return stateContext -> {
             System.out.println("PreAuth was called!!!");
             if (new Random().nextInt(10) < 7) {
@@ -59,6 +65,19 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<PaymentSta
             } else {
                 System.out.println("Declined! No Credit!!!!!");
                 sendEvent(stateContext, PaymentEvent.PRE_AUTH_DECLINED);
+            }
+        };
+    }
+
+    private Action<PaymentState, PaymentEvent> authorizeAction() {
+        return stateContext -> {
+            System.out.println("Auth was called!!!");
+            if (new Random().nextInt(10) < 3) {
+                System.out.println("Approved!");
+                sendEvent(stateContext, PaymentEvent.AUTH_APPROVED);
+            } else {
+                System.out.println("Declined! No Credit!!!!!");
+                sendEvent(stateContext, PaymentEvent.AUTH_DECLINED);
             }
         };
     }
